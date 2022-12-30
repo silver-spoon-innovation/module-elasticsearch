@@ -36,7 +36,7 @@ resource "helm_release" "kube-prometheus-sssm" {
   repository       = "https://github.com/elastic/helm-charts"
   chart            = "elasticsearch"
   version          = "8.5.1"
-  values           = ["${file("values.yaml")}"]
+  # values           = ["${file("values.yaml")}"]
 
   namespace        = kubernetes_namespace.ns-monitoring.metadata.0.name
   create_namespace = false
