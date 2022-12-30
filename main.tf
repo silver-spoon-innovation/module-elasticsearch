@@ -25,6 +25,12 @@ provider "helm" {
   }
 }
 
+resource "kubernetes_namespace" "ns-monitoring" {
+  metadata {
+    name = "monitoring"
+  }
+}
+
 resource "helm_release" "kube-prometheus-sssm" {
   name             = "elasticsearch-sssm"
   repository       = "https://github.com/elastic/helm-charts"
@@ -32,7 +38,7 @@ resource "helm_release" "kube-prometheus-sssm" {
   version          = "8.5.1"
   values           = ["${file("values.yaml")}"]
 
-  namespace        = var.monitoring_namespace
+  namespace        = kubernetes_namespace.ns-monitoring.metadata.0.name
   create_namespace = false
   timeout          = 1500 
 
