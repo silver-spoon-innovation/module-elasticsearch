@@ -33,7 +33,7 @@ resource "kubernetes_namespace" "ns-monitoring" {
 
 resource "helm_release" "kube-prometheus-sssm" {
   name             = "elasticsearch-sssm"
-  repository       = "https://github.com/elastic/helm-charts"
+  repository       = "https://helm.elastic.co"
   chart            = "elasticsearch"
   version          = "8.5.1"
   namespace        = kubernetes_namespace.ns-monitoring.metadata.0.name
