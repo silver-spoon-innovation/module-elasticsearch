@@ -1,5 +1,5 @@
 provider "aws" {
-  region = var.aws_region
+  region  = var.aws_region
   profile = var.aws_profile
 }
 
@@ -7,10 +7,10 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(var.kubernetes_cluster_cert_data)
   host                   = var.kubernetes_cluster_endpoint
   exec {
-      api_version = "client.authentication.k8s.io/v1beta1"
-      args        = ["eks", "get-token", "--cluster-name", var.kubernetes_cluster_name]
-      command     = "aws"
-    }
+    api_version = "client.authentication.k8s.io/v1beta1"
+    args        = ["eks", "get-token", "--cluster-name", var.kubernetes_cluster_name]
+    command     = "aws"
+  }
 }
 
 provider "helm" {
@@ -49,8 +49,42 @@ resource "helm_release" "kube-elasticsearch-sssm" {
   }
 
   set {
-    name = "antiAffinity"
+    name  = "antiAffinity"
     value = "soft"
   }
 
+  set {
+    name  = "resources.requests.cpu"
+    value = "100m"
+  }
+
+  set {
+    name  = "resources.requests.memory"
+    value = "200Mi"
+  }
+
+  set {
+    name  = "resources.limits.cpu"
+    value = "150m"
+  }
+
+  set {
+    name  = "resources.limits.memory"
+    value = "300Mi"
+  }
+
+  set {
+    name  = "initResources.limits.cpu"
+    value = "25m"
+  }
+
+  set {
+    name  = "initResources.requests.cpu"
+    value = "25m"
+  }
+
+  set {
+    name  = "initResources.requests.memory"
+    value = "128Mi"
+  }
 }
