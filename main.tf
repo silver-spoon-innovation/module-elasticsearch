@@ -31,14 +31,13 @@ resource "kubernetes_namespace" "ns-monitoring" {
   }
 }
 
-resource "helm_release" "kube-prometheus-sssm" {
+resource "helm_release" "kube-elasticsearch-sssm" {
   name             = "elasticsearch-sssm"
   repository       = "https://helm.elastic.co"
   chart            = "elasticsearch"
   version          = "8.5.1"
   namespace        = kubernetes_namespace.ns-monitoring.metadata.0.name
   create_namespace = false
-  timeout          = 1500 
 
   set {
     name  = "secret.enabled"
