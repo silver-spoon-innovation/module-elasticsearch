@@ -8,7 +8,7 @@ provider "kubernetes" {
   host                   = var.kubernetes_cluster_endpoint
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
-    args        = ["eks", "get-token", "--cluster-name", var.kubernetes_cluster_name]
+    args        = ["eks", "get-token", "--cluster-name", var.kubernetes_cluster_name, "--profile", var.aws_profile]
     command     = "aws"
   }
 }
@@ -19,15 +19,15 @@ provider "helm" {
     host                   = var.kubernetes_cluster_endpoint
     exec {
       api_version = "client.authentication.k8s.io/v1beta1"
-      args        = ["eks", "get-token", "--cluster-name", var.kubernetes_cluster_name]
+      args        = ["eks", "get-token", "--cluster-name", var.kubernetes_cluster_name,  "--profile", var.aws_profile]
       command     = "aws"
     }
   }
 }
 
-resource "kubernetes_namespace" "ns-monitoring" {
+resource "kubernetes_namespace" "ns-logging" {
   metadata {
-    name = "monitoring"
+    name = "logging"
   }
 }
 
@@ -36,55 +36,38 @@ resource "helm_release" "kube-elasticsearch-sssm" {
   repository       = "https://helm.elastic.co"
   chart            = "elasticsearch"
   version          = "8.5.1"
-  namespace        = kubernetes_namespace.ns-monitoring.metadata.0.name
+  namespace        = kubernetes_namespace.ns-logging.metadata.0.name
   create_namespace = false
 
   set {
-    name  = "secret.enabled"
-    value = "true"
+    name  = "replicas"
+    value = 2
   }
   set {
-    name  = "secret.password"
-    value = "sssmdevsearch"
-  }
-
-  set {
-    name  = "antiAffinity"
-    value = "soft"
-  }
-
-  set {
-    name  = "resources.requests.cpu"
-    value = "100m"
+    name  = "minimumMasterNodes"
+    value = 1
   }
 
   set {
     name  = "resources.requests.memory"
-    value = "200Mi"
-  }
-
-  set {
-    name  = "resources.limits.cpu"
-    value = "150m"
+    value = "1Gi"
   }
 
   set {
     name  = "resources.limits.memory"
-    value = "300Mi"
+    value = "1Gi"
   }
+}
 
-  set {
-    name  = "initResources.limits.cpu"
-    value = "25m"
-  }
+resource "helm_release" "kube-logstash-sssm" {
+  name             = "logstash-sssm"
+  repository       = "https://helm.elastic.co"
+  chart            = "logstash"
+  version          = "8.5.1"
+  namespace        = kubernetes_namespace.ns-logging.metadata.0.name
+  create_namespace = false
 
-  set {
-    name  = "initResources.requests.cpu"
-    value = "25m"
-  }
-
-  set {
-    name  = "initResources.requests.memory"
-    value = "128Mi"
-  }
+  values = [
+    file("${path.module}/values-files/logstash-values.yaml")
+  ]
 }
