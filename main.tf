@@ -32,7 +32,7 @@ resource "kubernetes_namespace" "ns-logging" {
 }
 
 resource "helm_release" "kube-elasticsearch-sssm" {
-  name             = "elasticsearch-sssm"
+  name             = "elasticsearch"
   repository       = "https://helm.elastic.co"
   chart            = "elasticsearch"
   version          = "8.5.1"
@@ -60,7 +60,7 @@ resource "helm_release" "kube-elasticsearch-sssm" {
 }
 
 resource "helm_release" "kube-logstash-sssm" {
-  name             = "logstash-sssm"
+  name             = "logstash"
   repository       = "https://helm.elastic.co"
   chart            = "logstash"
   version          = "8.5.1"
@@ -73,7 +73,7 @@ resource "helm_release" "kube-logstash-sssm" {
 }
 
 resource "helm_release" "kube-filebeat-sssm" {
-  name             = "filebeat-sssm"
+  name             = "filebeat"
   repository       = "https://helm.elastic.co"
   chart            = "filebeat"
   version          = "8.5.1"
@@ -86,7 +86,7 @@ resource "helm_release" "kube-filebeat-sssm" {
 }
 
 resource "helm_release" "kube-kibana-sssm" {
-  name             = "kibana-sssm"
+  name             = "kibana"
   repository       = "https://helm.elastic.co"
   chart            = "kibana"
   version          = "8.5.1"
