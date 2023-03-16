@@ -19,7 +19,7 @@ provider "helm" {
     host                   = var.kubernetes_cluster_endpoint
     exec {
       api_version = "client.authentication.k8s.io/v1beta1"
-      args        = ["eks", "get-token", "--cluster-name", var.kubernetes_cluster_name,  "--profile", var.aws_profile]
+      args        = ["eks", "get-token", "--cluster-name", var.kubernetes_cluster_name, "--profile", var.aws_profile]
       command     = "aws"
     }
   }
@@ -70,4 +70,45 @@ resource "helm_release" "kube-logstash-sssm" {
   values = [
     file("${path.module}/values-files/logstash-values.yaml")
   ]
+}
+
+resource "helm_release" "kube-filebeat-sssm" {
+  name             = "filebeat-sssm"
+  repository       = "https://helm.elastic.co"
+  chart            = "filebeat"
+  version          = "8.5.1"
+  namespace        = kubernetes_namespace.ns-logging.metadata.0.name
+  create_namespace = false
+
+  values = [
+    file("${path.module}/values-files/filebeat-values.yaml")
+  ]
+}
+
+resource "helm_release" "kube-kibana-sssm" {
+  name             = "kibana-sssm"
+  repository       = "https://helm.elastic.co"
+  chart            = "kibana"
+  version          = "8.5.1"
+  namespace        = kubernetes_namespace.ns-logging.metadata.0.name
+  create_namespace = false
+
+  set {
+    name  = "resources.requests.cpu"
+    value = "50m"
+  }
+  set {
+    name  = "resources.requests.memory"
+    value = "1Gi"
+  }
+
+  set {
+    name  = "resources.limits.cpu"
+    value = "50m"
+  }
+
+  set {
+    name  = "resources.limits.memory"
+    value = "1Gi"
+  }
 }
